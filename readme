@@ -1,0 +1,14 @@
+# 4.17 4.18工作日志
+(1)3D模型运用bview打开后还是2D平面域，logfile的结果也说明了这一点，现需要排查原因
+：使用porous3D的气泡生成函数尝试？ 还是出现同样的问题
+：考虑排查bview的问题？发现问题，应该是bview的参数设置有误，使用相同命令打开bubble.c(example文件)也会出现只显示2D的情况
+	：综合结果来看是可以运行的，但推测是因为宏的原因，bview误判其为2D模型
+	：重大问题，在打开有关log文件后发现bubble_example是没有z方向数据的，即计算结果也是2D
+：使用dump()函数，使用bview3D静态查看，针对porous的dump()静态查看失败，显示内存出错
+：使用dump()函数与bview3D对bubble_example进行静态查看，同样失败
+：运用bview对porous3D进行观测，并无问题，则排除bview动态查看命令'CFLAGS=-DDISPLAY=-1 make PROJECT.tst'错误
+：怀疑预处理宏中可能出现问题，排查所有#if dimension == 3的命令
+	：lambda2.h出现问题报错无法编译，原因似乎是系统默认模型为2D从而没有z向分量，经过文档阅读尝试把view.h放在前面（证实无关）
+	
+# 4.19至4.20工作日志
+问题解决！原因是makefile的编译有问题，其在进行组合编译的时候会默认为2D模型，如果加上3D网格"octree.h"问题解决
